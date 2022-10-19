@@ -8,6 +8,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -19,6 +20,9 @@ class BankingIndicatorOverlay extends Overlay {
     private final Client client;
     private final StatusIndicatorsExtendedConfig config;
     private final StatusIndicatorsExtendedPlugin plugin;
+
+    @Inject
+    private OverlayManager overlayManager;
 
     @Inject
     private BankingIndicatorOverlay(final Client client, final StatusIndicatorsExtendedConfig config, final StatusIndicatorsExtendedPlugin plugin) {
@@ -49,6 +53,8 @@ class BankingIndicatorOverlay extends Overlay {
                 final Point tickCounterPoint = new Point(preferredSize.width + 18 / 3, preferredSize.height - (preferredSize.height / 2) + 6);
                 OverlayUtil.renderTextLocation(graphics, tickCounterPoint, "banking", config.bankColor());
             }
+        } else if (config.displayBank() == false) {
+            overlayManager.remove(this);
         }
 
         return preferredSize;

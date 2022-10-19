@@ -4,6 +4,8 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -36,7 +38,7 @@ public class StatusIndicatorsExtendedPlugin extends Plugin {
     @Inject
     private IdleIndicatorOverlay idleoverlay;
     @Inject
-    private BankingIndicatorOverlay bankingoverlay;
+    public BankingIndicatorOverlay bankingoverlay;
     @Inject
     private ConfigManager configManager;
 
@@ -53,6 +55,22 @@ public class StatusIndicatorsExtendedPlugin extends Plugin {
         overlayManager.add(loggedInOverlay);
         overlayManager.add(idleoverlay);
         overlayManager.add(bankingoverlay);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (config.displayBank() == true) {
+            overlayManager.add(bankingoverlay);
+        }
+        else overlayManager.remove(bankingoverlay);
+        if (config.displayIdle() == true) {
+            overlayManager.add(idleoverlay);
+        }
+        else overlayManager.remove(idleoverlay);
+        if (config.displayConnected() == true) {
+            overlayManager.add(loggedInOverlay);
+        }
+        else overlayManager.remove(loggedInOverlay);
     }
 
     @Override

@@ -35,6 +35,7 @@ public class ObjectIndicatorsExtendedPlugin extends Plugin {
     private static final String MARK = "Mark object";
     private static final String UNMARK = "Unmark object";
 
+
     @Getter(AccessLevel.PACKAGE)
     private final List<ColorTileObject> objects = new ArrayList<>();
     private final Map<Integer, Set<ObjectPoint>> points = new HashMap<>();

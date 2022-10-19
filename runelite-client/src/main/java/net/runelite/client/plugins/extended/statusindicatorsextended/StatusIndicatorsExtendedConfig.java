@@ -31,7 +31,6 @@ public interface StatusIndicatorsExtendedConfig extends Config {
         return 2000;
     }
 
-
     @ConfigItem(
             keyName = "idleColor",
             name = "Idle color",
