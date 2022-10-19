@@ -12,6 +12,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -47,9 +48,9 @@ public class ObjectIndicatorsExtendedPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private ObjectIndicatorsExtendedOverlay overlay;
+    private ObjectIndicatorsExtendedOverlay mainoverlay;
     @Inject
-    private HoverIndicatorOverlay overlay2;
+    private HoverIndicatorOverlay hoveringoverlay;
     @Inject
     private ObjectIndicatorsExtendedConfig config;
     @Inject
@@ -62,14 +63,22 @@ public class ObjectIndicatorsExtendedPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        overlayManager.add(overlay);
-        overlayManager.add(overlay2);
+        overlayManager.add(mainoverlay);
+        overlayManager.add(hoveringoverlay);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (config.showMouseHover() == true) {
+            overlayManager.add(hoveringoverlay);
+        }
+        else overlayManager.remove(hoveringoverlay);
     }
 
     @Override
     protected void shutDown() {
-        overlayManager.remove(overlay);
-        overlayManager.remove(overlay2);
+        overlayManager.remove(mainoverlay);
+        overlayManager.remove(hoveringoverlay);
         points.clear();
         objects.clear();
     }

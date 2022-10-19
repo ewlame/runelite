@@ -34,7 +34,7 @@ public class StatusIndicatorsExtendedPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private LoggedInIndicatorOverlay loggedInOverlay;
+    private LoggedInIndicatorOverlay loggedinoverlay;
     @Inject
     private IdleIndicatorOverlay idleoverlay;
     @Inject
@@ -52,7 +52,7 @@ public class StatusIndicatorsExtendedPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        overlayManager.add(loggedInOverlay);
+        overlayManager.add(loggedinoverlay);
         overlayManager.add(idleoverlay);
         overlayManager.add(bankingoverlay);
     }
@@ -68,14 +68,14 @@ public class StatusIndicatorsExtendedPlugin extends Plugin {
         }
         else overlayManager.remove(idleoverlay);
         if (config.displayConnected() == true) {
-            overlayManager.add(loggedInOverlay);
+            overlayManager.add(loggedinoverlay);
         }
-        else overlayManager.remove(loggedInOverlay);
+        else overlayManager.remove(loggedinoverlay);
     }
 
     @Override
     protected void shutDown() {
-        overlayManager.remove(loggedInOverlay);
+        overlayManager.remove(loggedinoverlay);
         overlayManager.remove(idleoverlay);
         overlayManager.remove(bankingoverlay);
 
