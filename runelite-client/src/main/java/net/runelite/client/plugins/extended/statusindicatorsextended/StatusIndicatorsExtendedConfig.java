@@ -1,7 +1,11 @@
 package net.runelite.client.plugins.extended.statusindicatorsextended;
 
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Units;
+
 import java.awt.*;
-import net.runelite.client.config.*;
 
 @ConfigGroup("statusindicatorsextended")
 public interface StatusIndicatorsExtendedConfig extends Config {
@@ -17,13 +21,15 @@ public interface StatusIndicatorsExtendedConfig extends Config {
     }
 
     @ConfigItem(
-    		keyName = "idleDelay",
-    		name = "Idle Indication Delay",
-    		description = "The indicator delay after the player is idle.",
-    		position = 002
+            keyName = "idleDelay",
+            name = "Idle Indication Delay",
+            description = "The indicator delay after the player is idle.",
+            position = 002
     )
     @Units(Units.MILLISECONDS)
-    default int idleDelay() { return 2000; }
+    default int idleDelay() {
+        return 2000;
+    }
 
 
     @ConfigItem(
