@@ -1,62 +1,38 @@
 package net.runelite.client.plugins.extended.statusindicatorsextended;
 
-import net.runelite.api.AnimationID;
-import net.runelite.api.Client;
-import net.runelite.api.Player;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.plugins.extended.ExtendedIndicatorOverlay;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 
 import static net.runelite.api.AnimationID.IDLE;
 
 @Singleton
-class IdleIndicatorOverlay extends Overlay {
-    private static final int MINIMUM_SIZE = 16; // too small and resizing becomes impossible, requiring a reset
-    private final Client client;
-    private final StatusIndicatorsExtendedConfig config;
-    private final StatusIndicatorsExtendedPlugin plugin;
+class IdleIndicatorOverlay extends ExtendedIndicatorOverlay {
+    private final int lastAnimation = AnimationID.IDLE;
     private boolean idleCheck = false;
     private boolean animatedCheck = false;
     private Instant lastIdle;
     private Instant currentTime;
-    private final int lastAnimation = AnimationID.IDLE;
     private Instant lastMoving;
     private WorldPoint lastPosition;
     private boolean notifyPosition = false;
 
     @Inject
-    private IdleIndicatorOverlay(final Client client, final StatusIndicatorsExtendedConfig config, final StatusIndicatorsExtendedPlugin plugin) {
-        this.client = client;
-        this.config = config;
-        this.plugin = plugin;
-        setPosition(OverlayPosition.TOP_LEFT);
-        setMinimumSize(MINIMUM_SIZE);
-        setResizable(true);
-        setLayer(OverlayLayer.ABOVE_SCENE);
+    public IdleIndicatorOverlay(final Client client, final StatusIndicatorsExtendedConfig config, final StatusIndicatorsExtendedPlugin plugin) {
+        super(client, config, plugin);
+        colorMethod = () -> config.idleColor();
+        label = "idle";
     }
 
     @Override
-    public Dimension render(Graphics2D graphics) {
-        Dimension preferredSize = getPreferredSize();
-
-        if (preferredSize == null) {
-            preferredSize = plugin.DEFAULT_SIZE; // if this happens, reset to default
-            setPreferredSize(preferredSize); // shouldn't be common, but alt+rightclick will force this
-        }
-
+    public boolean test() {
         final Player local = client.getLocalPlayer();
-
         final Duration waitDuration = Duration.ofMillis(0);
-
         if (config.displayIdle()) {
             if (client.getLocalPlayer().getAnimation() == IDLE && !idleCheck) {
                 lastIdle = Instant.now();
@@ -70,19 +46,10 @@ class IdleIndicatorOverlay extends Overlay {
             if (checkMovementIdle(waitDuration, local)) {
                 idleCheck = false;
             }
-            if (idleCheck) {
-                if (timerComplete(lastIdle, config.idleDelay())) {
-                    graphics.setColor(config.idleColor());
-                    graphics.fillRect(0, 0, preferredSize.width, preferredSize.height);
-                    final Point tickCounterPoint = new Point(preferredSize.width + 18 / 3, preferredSize.height - (preferredSize.height / 2) + 6);
-                    OverlayUtil.renderTextLocation(graphics, tickCounterPoint, "idle", config.idleColor());
-                    if (client.getLocalPlayer().getAnimation() != IDLE)
-                        idleCheck = false;
-                }
-            }
+            return idleCheck && timerComplete(lastIdle, config.idleDelay());
+        } else {
+            return false;
         }
-
-        return preferredSize;
     }
 
     public boolean timerComplete(Instant duration1, long duration2) {
@@ -90,8 +57,8 @@ class IdleIndicatorOverlay extends Overlay {
         Duration duration = Duration.between(duration1, currentTime);
         long secondsElapsed = duration.getSeconds(); // * 1000 to get milliseconds number.
         long limit = duration2;
-		return (secondsElapsed * 1000) >= limit;
-	}
+        return (secondsElapsed * 1000) >= limit;
+    }
 
     private boolean checkMovementIdle(Duration waitDuration, Player local) {
         if (lastPosition == null) {
